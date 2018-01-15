@@ -1,0 +1,15 @@
+{
+  "name": "fashionswipe",
+  "version": "1.0.0",
+  "description": "Swipe your way to being to most fashionable being",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@awsii:fashionswipe"
+  },
+  "author": "Mickael Alliel",
+  "license": "ISC"
+}
