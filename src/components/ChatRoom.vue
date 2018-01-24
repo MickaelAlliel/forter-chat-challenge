@@ -6,8 +6,25 @@
 </template>
 
 <script>
+var rltm = require('rltm');
+const uuidv4 = require('uuid/v4');
 import ChatBox from './ChatBox.vue';
 import ChatUserList from './ChatUserList.vue';
+
+var user = rltm({
+  service: 'socketio',
+  config: {
+    endpoint: 'http://localhost:8081',
+    uuid: uuidv4(),
+    state: {}
+  }
+});
+
+var room = user.join('chatroom');
+
+room.on('join', (uuid, state) => {
+    console.log('user with uuid', uuid, 'joined with state', state);
+});
 
 export default {
   name: 'ChatRoom',
