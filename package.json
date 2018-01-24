@@ -1,7 +1,7 @@
 {
-  "name": "fashionswipe",
+  "name": "forter-chat-challenge",
   "version": "1.0.0",
-  "description": "The fastest way to become fashionable",
+  "description": "",
   "author": "Mickael Alliel <mickael.alliel@gmail.com>",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@mickaelalliel.com:fashionswipe.git"
+    "url": "git@mickaelalliel.com:forter-chat-challenge.git"
   },
   "dependencies": {
     "vue": "^2.5.2",
