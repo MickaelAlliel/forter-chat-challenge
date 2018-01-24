@@ -5,23 +5,44 @@
                 <chat-message :message="message"/>
             </div>
         </div>
-        <div id="input-area">
-            <textarea class="message-input" placeholder="Enter your message..."></textarea>
+        <div class="input-area">
+            <textarea class="message-input" placeholder="Enter your message..."
+                        v-on:keyup.enter="sendMessage"
+                        v-model="messageInput"></textarea>
+            <button v-on:click="sendMessage" class="message-send-btn">Send</button>
         </div>
     </div>
 </template>
 
 <script>
 import ChatMessage from './ChatMessage.vue';
+const uuidv4 = require('uuid/v4');
+var moment = require('moment');
 
 export default {
   name: 'ChatBox',
+  props: ['messages', 'room', 'user'],
   data () {
     return {
-      
+        messageInput: '',
     }
   },
-  props: ['messages'],
+  methods: {
+    sendMessage: function() {
+        if (this.messageInput == '')
+            return;
+
+        let message = {
+            id: uuidv4(),
+            timestamp: moment().format('HH:mm'),
+            user: this.user,
+            message: this.messageInput
+        };
+        this.room.emit('send message', message);
+        this.messageInput = '';
+        this.messages.push(message);
+    }
+  },
   components: {
       ChatMessage
   }
@@ -44,30 +65,48 @@ export default {
     .message-area {
         display: flex;
         flex-direction: column;
+
+        overflow-wrap: break-word;
+        overflow-y: scroll;
+    }
+
+    .input-area {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .message-send-btn {
+        width: 15%;
+        height: 25px;
+        transition: height 1s;
+
+        margin: 0;
+        padding: 0;
+    }
+
+    .message-input:focus + .message-send-btn, .message-input:focus {
+        height: 100px;
+        transition: height 1s;
+        outline: none;
+    }
+
+    .input-area:focus-within {
+        border-bottom-width: 5px;
+        border-bottom-color: rgb(69%, 87.8%, 90.2%);
+        border-bottom-style: solid;
     }
 
     .message-input {
-        width: 100%;
+        width: 85%;
         height: 25px;
         resize: none;
         padding: 0;
         margin: 0;
-        margin-bottom: -4px;
 
         border: 0px solid black;
         border-top-width: 1px;
 
         transition: height 1s;
-    }
-
-    .message-input:focus {
-        height: 100px;
-        transition: height 1s;
-        outline: none;
-
-        border-bottom-width: 5px;
-        border-bottom-color: rgb(69%, 87.8%, 90.2%);
-        border-bottom-style: solid;
     }
 
     .message-input::placeholder {

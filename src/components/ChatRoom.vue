@@ -1,46 +1,78 @@
 <template>
-  <div class="container">
-    <chat-box :messages="messages"/>
-    <chat-user-list :users="users"/>
+  <div class="container-vertical">
+    <div v-if="!room">
+      <h5>Choose a username to enter the chat:</h5>
+      <div class="container">
+        <input type="text" v-model="user.username" placeholder="Username">
+        <button v-on:click="connect">Connect</button>
+      </div>
+    </div>
+    <div class="container" v-if="room">
+      <chat-box :messages="messages" :room="room" :user="user"/>
+      <chat-user-list :users="users" :user="user"/>
+    </div>
   </div>
 </template>
 
 <script>
-var rltm = require('rltm');
+import io from 'socket.io-client';
 const uuidv4 = require('uuid/v4');
 import ChatBox from './ChatBox.vue';
 import ChatUserList from './ChatUserList.vue';
 
-var user = rltm({
-  service: 'socketio',
-  config: {
-    endpoint: 'http://localhost:8081',
-    uuid: uuidv4(),
-    state: {}
-  }
-});
-
-var room = user.join('chatroom');
-
-room.on('join', (uuid, state) => {
-    console.log('user with uuid', uuid, 'joined with state', state);
-});
 
 export default {
   name: 'ChatRoom',
+  methods: {
+    connect: function() {
+      if (this.user.username != '') {
+        this.room = io.connect('http://localhost:8081');
+        this.room.emit('connected', this.user);
+        this.loadUsers();
+        this.loadHistory();
+        this.newMessageListener();
+      }
+    },
+    newMessageListener: function() {
+      var state = this;
+      this.room.on('new message', function(data) {
+        // If this message is from the current user, it already has been added
+        if (data.user.id != state.user.id) {
+          state.messages.push(data);
+        }
+      });
+    },
+    loadUsers: function() {
+
+    },
+    loadHistory: function() {
+
+    }
+  },
   data () {
     return {
-      users: ['mickael', 'john', 'janette'],
-      messages: [{id: 1, timestamp: '12:30', username: 'mickael', message: 'test message lel'},
-      {id: 2, timestamp: '12:30', username: 'mickael', message: 'test message lel'},
-      {id: 3, timestamp: '12:30', username: 'mickael', message: 'test message lel'}]
+      room: null,
+      user: {
+        id: uuidv4(),
+        username: ''
+      },
+      users: [],
+      messages: []
     }
   },
   components: {
     ChatBox,
     ChatUserList
+  },
+  mounted: function() {
+    window.addEventListener('beforeunload', function() {
+      this.room.emit('disconnected', user);
+    });
   }
 }
+
+
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -55,6 +87,15 @@ export default {
       justify-content: center;
       align-items: center;
 
-      margin-top: 50px;
+      margin-top: 25px;
+  }
+
+  .container-vertical {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      margin-top: 25px;
   }
 </style>

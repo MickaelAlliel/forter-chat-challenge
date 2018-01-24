@@ -1,8 +1,11 @@
 <template>
     <div class="chat-user-list">
         <ul>
-            <li v-for="user in users" :key="user">
-                {{user}}
+            <li class="this-username">
+                {{user.username}}
+            </li>
+            <li v-for="user in users" :key="user.id">
+                {{user.username}}
             </li>
         </ul>
     </div>
@@ -16,7 +19,7 @@
         
         }
     },
-    props: ['users']
+    props: ['users', 'user']
     }
 </script>
 
@@ -31,5 +34,9 @@
         list-style: none;
         margin: 0;
         padding: 0;
+    }
+
+    .this-username {
+        color: royalblue;
     }
 </style>

@@ -4,7 +4,7 @@
             {{message.timestamp}}
         </span>
         <span class="chat-username">
-            {{message.username}}
+            {{message.user.username}}:
         </span>
         <span class="chat-text">
             {{message.message}}
