@@ -7,6 +7,15 @@ io.origins('*:*');
 var connectedUsers = [];
 var messageHistory = [];
 
+var moment = require('moment');
+var uuidv4 = require('uuid/v4');
+var ChatAgent = require('./chat_agent');
+var Agent = ChatAgent.Agent;
+// Adding the bot to the user list
+connectedUsers.push(Agent.user);
+// Initializing bot knowledge
+var hasUnknownQuestion = false;
+
 io.on('connection', function(client){
   client.on('connected', function(user) {
     io.emit('add user', user);
@@ -30,8 +39,10 @@ io.on('connection', function(client){
   client.on('send message', function(data) {
     io.emit('new message', data);
     messageHistory.push(data);
-
     console.log(`NEW MSG FROM: ${data.user.username}`);
+
+    // Bot logic
+    AgentLearn(data);
   });
 
   client.on('get users', function(client_id) {
@@ -48,3 +59,34 @@ io.on('connection', function(client){
 server.listen(port, function(){
   console.log(`Socket server listening on port :${port}`);
 });
+
+
+function AgentLearn(data) {
+  // Do not check if it is a message from the bot
+  if (data.user.id == Agent.user.id)
+    return;
+
+  if (hasUnknownQuestion) {
+    Agent.known[Agent.known.length - 1].answer = data.message;
+    hasUnknownQuestion = false;
+  } else {
+    let res = Agent.parse(data.message);
+    if (!res.needResponse) {
+      if (res.response != null) {
+        let botMsg = {
+          id: uuidv4(),
+          timestamp: moment().format('HH:mm'),
+          user: Agent.user,
+          message: res.response
+        };
+        messageHistory.push(botMsg);
+        setTimeout(function() {
+          io.emit('new message', botMsg);
+        }, 300);
+        console.log(`NEW MSG FROM: ${botMsg.user.username}`);
+      }
+    } else {
+      hasUnknownQuestion = true;
+    }
+  }
+}
