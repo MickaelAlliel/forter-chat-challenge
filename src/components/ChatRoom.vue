@@ -3,7 +3,7 @@
     <div v-if="!room">
       <h5>Choose a username to enter the chat:</h5>
       <div class="container">
-        <input type="text" v-model="user.username" placeholder="Username">
+        <input type="text" v-model="user.username" v-on:keyup.enter="connect" placeholder="Username" autofocus>
         <button v-on:click="connect">Connect</button>
       </div>
     </div>
@@ -26,11 +26,16 @@ export default {
   methods: {
     connect: function() {
       if (this.user.username != '') {
-        this.room = io.connect('http://localhost:8081');
-        this.room.emit('connected', this.user);
-        this.loadUsers();
-        this.loadHistory();
-        this.newMessageListener();
+        var state = this;
+        this.room = io('http://localhost:8081');
+
+        this.room.on('connect', function() {
+          state.user.socket_id = state.room.id;
+          state.room.emit('connected', state.user);
+          state.loadUsers();
+          state.loadHistory();
+          state.newMessageListener();
+        });
       }
     },
     newMessageListener: function() {
@@ -43,10 +48,20 @@ export default {
       });
     },
     loadUsers: function() {
-
+      var state = this;
+      this.room.on('users list', function(users) {
+        state.users = users;
+      });
+      
+      this.room.emit('get users', this.room.id);
     },
     loadHistory: function() {
-
+      var state = this;
+      this.room.on('message history', function(history) {
+        state.messages = history;
+      });
+      
+      this.room.emit('get history', this.room.id);
     }
   },
   data () {
@@ -65,9 +80,7 @@ export default {
     ChatUserList
   },
   mounted: function() {
-    window.addEventListener('beforeunload', function() {
-      this.room.emit('disconnected', user);
-    });
+    
   }
 }
 

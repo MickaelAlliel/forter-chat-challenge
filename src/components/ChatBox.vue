@@ -41,10 +41,41 @@ export default {
         this.room.emit('send message', message);
         this.messageInput = '';
         this.messages.push(message);
+    },
+    handleChatHeight: function() {
+        var messageInput = $('.message-input');
+        var messageArea = $('.message-area');
+        var state = this;
+
+        messageInput.on('focus', function() {
+            messageArea.addClass('message-area-slide-up');
+            state.scrollMessages();
+        });
+
+        messageInput.on('blur', function() {
+            messageArea.removeClass('message-area-slide-up');
+        })
+    },
+    scrollMessages: function() {
+        let area = $('.message-area');
+        area.stop().animate({
+            scrollTop: area.prop('scrollHeight')
+        }, 800);
     }
+  },
+  mounted: function() {
+    this.handleChatHeight();
+  },
+  updated: function() {
+    this.scrollMessages();
   },
   components: {
       ChatMessage
+  },
+  watch: {
+      messages: function(val) {
+        this.scrollMessages();
+      }
   }
 }
 </script>
@@ -54,8 +85,11 @@ export default {
     .chat {
         background-color: white;
         box-shadow: 0px 0px 5px 1px black;
+        max-height: 500px;
         height: 500px;
         width: 400px;
+
+        overflow: hidden;
 
         display: flex;
         flex-direction: column;
@@ -66,8 +100,16 @@ export default {
         display: flex;
         flex-direction: column;
 
+        max-height: 500px;
+        transition: max-height 1s;
+
         overflow-wrap: break-word;
         overflow-y: scroll;
+    }
+
+    .message-area-slide-up {
+        max-height: 400px;
+        transition: max-height 1s;
     }
 
     .input-area {

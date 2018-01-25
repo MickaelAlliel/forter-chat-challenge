@@ -1,11 +1,8 @@
 <template>
     <div class="chat-user-list">
         <ul>
-            <li class="this-username">
-                {{user.username}}
-            </li>
-            <li v-for="user in users" :key="user.id">
-                {{user.username}}
+            <li v-for="u in users" :key="u.id" v-bind:class="{'this-username':(u.id == user.id)}">
+                {{u.username}}
             </li>
         </ul>
     </div>
