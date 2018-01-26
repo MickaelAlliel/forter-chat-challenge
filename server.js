@@ -38,7 +38,7 @@ io.on('connection', function(client){
 
   client.on('disconnect', function(user){
     connectedUsers = connectedUsers.filter(function(user) {
-      if (io.sockets.sockets[user.socket_id] != undefined) {
+      if (io.sockets.sockets[user.socket_id] != undefined || user.id == Agent.user.id) {
         return true;
       }
       console.log(`DISCONNECTED : ${user.username} [${user.id}]`);
