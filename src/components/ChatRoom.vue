@@ -32,7 +32,7 @@ export default {
       if (this.user.username != '') {
         this.user.id = uuidv4();
         var state = this;
-        this.room = io('http://localhost:8081');
+        this.room = io();
 
         this.room.on('connect', function() {
           state.user.socket_id = state.room.id;

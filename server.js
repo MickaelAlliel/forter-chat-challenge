@@ -1,8 +1,20 @@
-var server = require('http').createServer();
+var express = require('express');
+var app = express();
+var morgan = require('morgan');
+var server = require('http').Server(app);
 var io = require('socket.io')(server);
-const port = 8081;
+var path = require('path');
+const port = process.argv[2] || 8082;
 
 io.origins('*:*');
+
+app.use(morgan('combined'));
+app.use('/static', express.static(path.join(__dirname, 'dist', 'static')));
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
 
 var connectedUsers = [];
 var messageHistory = [];
@@ -57,7 +69,7 @@ io.on('connection', function(client){
 });
 
 server.listen(port, function(){
-  console.log(`Socket server listening on port :${port}`);
+  console.log(`Server listening on http://localhost:${port}`);
 });
 
 

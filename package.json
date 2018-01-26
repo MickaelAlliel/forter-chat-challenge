@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "socket": "node socket-server.js",
+    "prod": "node server.js",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit",
@@ -18,7 +18,9 @@
     "url": "git@mickaelalliel.com:forter-chat-challenge.git"
   },
   "dependencies": {
+    "express": "^4.16.2",
     "moment": "^2.20.1",
+    "morgan": "^1.9.0",
     "socket.io": "^2.0.4",
     "socket.io-client": "^2.0.4",
     "uuid": "^3.2.1",
